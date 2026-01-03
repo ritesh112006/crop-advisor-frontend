@@ -2,57 +2,47 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
-import { 
-  Sprout, 
-  Cloud, 
-  Bell, 
-  MessageCircle, 
-  ArrowRight,
-  Droplets,
-  Thermometer,
-  Leaf,
-  Zap,
-  Globe,
-  ChevronRight
-} from "lucide-react";
-
-const features = [
-  {
-    icon: Sprout,
-    title: "AI Crop Recommendation",
-    description: "Get personalized crop suggestions based on your soil conditions, location, and season.",
-    color: "bg-leaf/10 text-leaf",
-  },
-  {
-    icon: Cloud,
-    title: "Real-time Weather Insights",
-    description: "Access current weather data and forecasts to plan your farming activities effectively.",
-    color: "bg-water/10 text-water",
-  },
-  {
-    icon: Bell,
-    title: "Smart Alerts",
-    description: "Receive timely warnings about weather changes, irrigation needs, and crop health issues.",
-    color: "bg-warning/10 text-warning",
-  },
-  {
-    icon: MessageCircle,
-    title: "Multilingual Chatbot",
-    description: "Ask questions in your preferred language and get instant farming advice.",
-    color: "bg-primary/10 text-primary",
-  },
-];
-
-const workflowSteps = [
-  { icon: Droplets, label: "Soil Analysis", description: "IoT sensors collect soil data" },
-  { icon: Cloud, label: "Weather Data", description: "Real-time weather integration" },
-  { icon: Zap, label: "AI Processing", description: "Advanced ML algorithms" },
-  { icon: Leaf, label: "Recommendation", description: "Personalized crop advice" },
-];
-
+import { Sprout, Cloud, Bell, MessageCircle, ArrowRight, Droplets, Thermometer, Leaf, Zap, Globe, ChevronRight } from "lucide-react";
+const features = [{
+  icon: Sprout,
+  title: "AI Crop Recommendation",
+  description: "Get personalized crop suggestions based on your soil conditions, location, and season.",
+  color: "bg-leaf/10 text-leaf"
+}, {
+  icon: Cloud,
+  title: "Real-time Weather Insights",
+  description: "Access current weather data and forecasts to plan your farming activities effectively.",
+  color: "bg-water/10 text-water"
+}, {
+  icon: Bell,
+  title: "Smart Alerts",
+  description: "Receive timely warnings about weather changes, irrigation needs, and crop health issues.",
+  color: "bg-warning/10 text-warning"
+}, {
+  icon: MessageCircle,
+  title: "Multilingual Chatbot",
+  description: "Ask questions in your preferred language and get instant farming advice.",
+  color: "bg-primary/10 text-primary"
+}];
+const workflowSteps = [{
+  icon: Droplets,
+  label: "Soil Analysis",
+  description: "IoT sensors collect soil data"
+}, {
+  icon: Cloud,
+  label: "Weather Data",
+  description: "Real-time weather integration"
+}, {
+  icon: Zap,
+  label: "AI Processing",
+  description: "Advanced ML algorithms"
+}, {
+  icon: Leaf,
+  label: "Recommendation",
+  description: "Personalized crop advice"
+}];
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section */}
@@ -60,8 +50,8 @@ const Index = () => {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-hero opacity-5" />
         <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23166534' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23166534' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }} />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
           <div className="text-center max-w-4xl mx-auto">
@@ -75,12 +65,16 @@ const Index = () => {
               <span className="block text-gradient">System</span>
             </h1>
             
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: "0.1s" }}>
+            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-slide-up" style={{
+            animationDelay: "0.1s"
+          }}>
               Empowering farmers with AI-driven crop recommendations, real-time weather insights, 
               and smart alerts for sustainable and profitable farming.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{
+            animationDelay: "0.2s"
+          }}>
               <Button asChild variant="hero" size="xl">
                 <Link to="/recommendation">
                   Get Recommendation
@@ -111,8 +105,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4">
-            {workflowSteps.map((step, index) => (
-              <div key={index} className="relative">
+            {workflowSteps.map((step, index) => <div key={index} className="relative">
                 <Card variant="elevated" className="text-center p-6">
                   <CardContent className="p-0">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -125,13 +118,10 @@ const Index = () => {
                     <p className="text-sm text-muted-foreground">{step.description}</p>
                   </CardContent>
                 </Card>
-                {index < workflowSteps.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
+                {index < workflowSteps.length - 1 && <div className="hidden md:block absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
                     <ChevronRight className="h-6 w-6 text-muted-foreground/50" />
-                  </div>
-                )}
-              </div>
-            ))}
+                  </div>}
+              </div>)}
           </div>
         </div>
       </section>
@@ -149,8 +139,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} variant="elevated" className="group cursor-pointer">
+            {features.map((feature, index) => <Card key={index} variant="elevated" className="group cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-xl ${feature.color} group-hover:scale-110 transition-transform`}>
@@ -164,8 +153,7 @@ const Index = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -200,14 +188,10 @@ const Index = () => {
               </div>
               <span className="font-semibold text-foreground">Crop Advisor System</span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © 2024 Crop Advisor. Empowering Smart Agriculture.
-            </p>
+            <p className="text-sm text-muted-foreground">© 2026 Crop Advisor. Empowering Smart Agriculture.</p>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
