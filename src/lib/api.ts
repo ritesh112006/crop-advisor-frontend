@@ -1,14 +1,23 @@
-// ===============================
-// 🌾 Crop Advisor – API Service
-// ===============================
+// src/lib/api.ts
 
 const BASE_URL = "https://crop-advisor-backend-3hsd.onrender.com";
 
-// -------------------------------
-// 🔹 TYPES (Strong typing for TS)
-// -------------------------------
+// -------------------- SENSOR DATA --------------------
+export async function getLatestSensorData() {
+  const res = await fetch(`${BASE_URL}/latest`);
+  if (!res.ok) throw new Error("Failed to fetch sensor data");
+  return res.json();
+}
 
-export interface SensorData {
+// -------------------- WEATHER --------------------
+export async function getWeather(city: string = "Pune") {
+  const res = await fetch(`${BASE_URL}/weather?city=${city}`);
+  if (!res.ok) throw new Error("Failed to fetch weather data");
+  return res.json();
+}
+
+// -------------------- AI PREDICTION --------------------
+export async function getPrediction(data: {
   moisture: number;
   ph: number;
   temperature: number;
@@ -16,69 +25,13 @@ export interface SensorData {
   N: number;
   P: number;
   K: number;
-}
-
-export interface PredictionResponse {
-  recommended_crop: string;
-  recommended_fertilizer: string;
-  predicted_yield_ton_per_hectare: number;
-}
-
-// -------------------------------
-// 🔹 HELPER (Common response check)
-// -------------------------------
-
-async function handleResponse(res: Response) {
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "API Error");
-  }
-  return res.json();
-}
-
-// -------------------------------
-// 🌱 SENSOR – Latest Data
-// -------------------------------
-
-export async function getLatestSensor(): Promise<SensorData> {
-  const res = await fetch(`${BASE_URL}/latest`);
-  return handleResponse(res);
-}
-
-// -------------------------------
-// 🤖 AI – Crop Prediction
-// -------------------------------
-
-export async function getPrediction(
-  sensorData: SensorData
-): Promise<PredictionResponse> {
+}) {
   const res = await fetch(`${BASE_URL}/predict`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(sensorData),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
 
-  return handleResponse(res);
+  if (!res.ok) throw new Error("Prediction failed");
+  return res.json();
 }
-
-// -------------------------------
-// 🌦️ WEATHER – Live Weather
-// -------------------------------
-
-export async function getWeather(city: string = "Pune") {
-  const res = await fetch(
-    `${BASE_URL}/weather?city=${encodeURIComponent(city)}`
-  );
-  return handleResponse(res);
-}
-
-// -------------------------------
-// 📜 SENSOR HISTORY (Future-ready)
-// -------------------------------
-// Backend route can be added later
-// export async function getSensorHistory() {
-//   const res = await fetch(`${BASE_URL}/history`);
-//   return handleResponse(res);
-// }
