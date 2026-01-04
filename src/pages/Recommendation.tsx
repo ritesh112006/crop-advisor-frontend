@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCrop } from "@/contexts/CropContext";
-import { getLatestSensor, getPrediction } from "@/lib/api";
+import { getLatestSensorData, getPrediction } from "@/lib/api";
 
 /* ---------- TYPES ---------- */
 interface CropRecommendation {
@@ -45,7 +45,7 @@ const Recommendations = () => {
   useEffect(() => {
     async function loadData() {
       try {
-        const sensor = await getLatestSensor();
+        const sensor = await getLatestSensorData();
         setSensorData(sensor);
 
         const prediction = await getPrediction(sensor);
