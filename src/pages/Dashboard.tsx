@@ -1,223 +1,191 @@
-import Navbar from "@/components/Navbar";
-import SensorCard from "@/components/SensorCard";
-import WeatherWidget from "@/components/WeatherWidget";
-import AlertCard from "@/components/AlertCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Droplets, 
-  Thermometer, 
-  Wind, 
-  Leaf,
-  Activity,
-  TrendingUp
+import { useEffect, useState } from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import NPKSensor from "@/components/sensors/NPKSensor";
+import MoistureSensor from "@/components/sensors/MoistureSensor";
+import TempHumiditySensor from "@/components/sensors/TempHumiditySensor";
+import PHSensor from "@/components/sensors/PHSensor";
+import {
+  CloudSun,
+  Droplets,
+  Wind,
+  Sun,
+  CheckCircle,
+  AlertTriangle,
+  TrendingUp,
+  Sprout,
 } from "lucide-react";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from "recharts";
-
-const sensorData = [
-  { title: "Soil Moisture", value: 65, unit: "%", icon: Droplets, status: "good" as const, colorClass: "bg-water/10 text-water" },
-  { title: "Temperature", value: 28, unit: "°C", icon: Thermometer, status: "good" as const, colorClass: "bg-warning/10 text-warning" },
-  { title: "Humidity", value: 72, unit: "%", icon: Wind, status: "good" as const, colorClass: "bg-info/10 text-info" },
-  { title: "Nitrogen (N)", value: 45, unit: "mg/kg", icon: Leaf, status: "warning" as const, colorClass: "bg-leaf/10 text-leaf" },
-  { title: "Phosphorus (P)", value: 32, unit: "mg/kg", icon: Leaf, status: "good" as const, colorClass: "bg-primary/10 text-primary" },
-  { title: "Potassium (K)", value: 58, unit: "mg/kg", icon: Leaf, status: "good" as const, colorClass: "bg-soil/10 text-soil" },
-];
-
-const weatherData = {
-  temperature: 28,
-  humidity: 72,
-  condition: "sunny" as const,
-  windSpeed: 12,
-  forecast: [
-    { day: "Mon", temp: 29, condition: "sunny" },
-    { day: "Tue", temp: 27, condition: "cloudy" },
-    { day: "Wed", temp: 26, condition: "rainy" },
-    { day: "Thu", temp: 28, condition: "sunny" },
-    { day: "Fri", temp: 30, condition: "sunny" },
-  ],
-};
-
-const moistureHistory = [
-  { time: "6 AM", value: 55 },
-  { time: "9 AM", value: 58 },
-  { time: "12 PM", value: 62 },
-  { time: "3 PM", value: 68 },
-  { time: "6 PM", value: 65 },
-  { time: "9 PM", value: 63 },
-];
-
-const alerts = [
-  {
-    title: "Optimal Conditions",
-    message: "Soil conditions are suitable for crop growth. All parameters within healthy range.",
-    severity: "info" as const,
-    time: "Just now",
-  },
-  {
-    title: "Low Nitrogen Detected",
-    message: "Nitrogen levels are slightly below optimal for wheat cultivation.",
-    severity: "medium" as const,
-    action: "Consider applying nitrogen-rich fertilizer in the next 3 days.",
-    time: "2 hours ago",
-  },
-];
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { getLatestSensor } from "@/lib/api";
 
 const Dashboard = () => {
+  const [sensorData, setSensorData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real sensor data
+  useEffect(() => {
+    getLatestSensor()
+      .then((data) => {
+        setSensorData({
+          npk: {
+            nitrogen: data.n,
+            phosphorus: data.p,
+            potassium: data.k,
+          },
+          moisture: data.moisture,
+          tempHumidity: {
+            temperature: data.temperature,
+            humidity: data.humidity,
+          },
+          ph: data.ph,
+        });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Sensor fetch error:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading || !sensorData) {
+    return (
+      <DashboardLayout>
+        <div className="p-8 text-lg">Loading live sensor data...</div>
+      </DashboardLayout>
+    );
+  }
+
+  const soilStatus = {
+    overall: "Good",
+    message: "Soil condition is suitable for crop growth",
+    details: [
+      { label: "Moisture", status: "optimal", value: `${sensorData.moisture}%` },
+      { label: "NPK Balance", status: "good", value: "Normal" },
+      { label: "pH Level", status: "optimal", value: sensorData.ph },
+      {
+        label: "Temperature",
+        status: "good",
+        value: `${sensorData.tempHumidity.temperature}°C`,
+      },
+    ],
+  };
+
+  const weatherData = {
+    current: {
+      temp: sensorData.tempHumidity.temperature,
+      humidity: sensorData.tempHumidity.humidity,
+      wind: 12,
+      condition: "Partly Cloudy",
+    },
+    forecast: [
+      { day: "Today", high: 34, low: 24, icon: Sun },
+      { day: "Tomorrow", high: 32, low: 23, icon: CloudSun },
+      { day: "Wed", high: 30, low: 22, icon: Droplets },
+    ],
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <main className="page-container">
-        {/* Header */}
-        <div className="page-header">
-          <h1 className="page-title">Farm Dashboard</h1>
-          <p className="page-description">
-            Real-time monitoring of your farm conditions and IoT sensor data
-          </p>
+    <DashboardLayout>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-serif font-bold">Farm Dashboard</h1>
+        <p className="text-muted-foreground">
+          Real-time overview of your farm conditions
+        </p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="flex gap-3 mb-8">
+        <Link to="/recommendations">
+          <Button className="gap-2">
+            <Sprout className="w-4 h-4" />
+            Get Crop Advice
+          </Button>
+        </Link>
+        <Link to="/chatbot">
+          <Button variant="outline">Ask AI Assistant</Button>
+        </Link>
+      </div>
+
+      {/* Soil Status */}
+      <div className="p-6 rounded-2xl bg-card shadow mb-8">
+        <div className="flex items-center gap-4 mb-4">
+          <CheckCircle className="w-8 h-8 text-green-600" />
+          <div>
+            <h2 className="text-xl font-semibold">
+              Crop Health: <span className="text-green-600">{soilStatus.overall}</span>
+            </h2>
+            <p className="text-muted-foreground">{soilStatus.message}</p>
+          </div>
         </div>
 
-        {/* Sensor Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {sensorData.map((sensor, index) => (
-            <SensorCard
-              key={index}
-              title={sensor.title}
-              value={sensor.value}
-              unit={sensor.unit}
-              icon={sensor.icon}
-              status={sensor.status}
-              colorClass={sensor.colorClass}
-            />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {soilStatus.details.map((d) => (
+            <div key={d.label} className="p-4 bg-muted rounded-xl">
+              <p className="text-sm text-muted-foreground">{d.label}</p>
+              <p className="font-semibold">{d.value}</p>
+            </div>
           ))}
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Soil Moisture Chart */}
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-primary" />
-                Soil Moisture Trend
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={moistureHistory}>
-                  <defs>
-                    <linearGradient id="colorMoisture" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(140, 15%, 85%)" />
-                  <XAxis 
-                    dataKey="time" 
-                    stroke="hsl(140, 10%, 40%)"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="hsl(140, 10%, 40%)"
-                    fontSize={12}
-                    domain={[40, 80]}
-                    tickFormatter={(value) => `${value}%`}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: "hsl(0, 0%, 100%)",
-                      border: "1px solid hsl(140, 15%, 85%)",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value: number) => [`${value}%`, "Moisture"]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="hsl(199, 89%, 48%)"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorMoisture)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      {/* Main Grid */}
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Sensors */}
+        <div className="lg:col-span-2">
+          <div className="flex items-center gap-2 mb-6">
+            <TrendingUp className="w-5 h-5" />
+            <h2 className="text-xl font-semibold">Live Sensor Data</h2>
+          </div>
 
-          {/* Weather Widget */}
-          <WeatherWidget data={weatherData} />
+          <div className="grid sm:grid-cols-2 gap-6">
+            <NPKSensor data={sensorData.npk} />
+            <MoistureSensor value={sensorData.moisture} />
+            <TempHumiditySensor data={sensorData.tempHumidity} />
+            <PHSensor value={sensorData.ph} />
+          </div>
         </div>
 
-        {/* Crop Health & Alerts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Crop Health Status */}
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-success" />
-                Crop Health Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-success/10 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
-                    <span className="font-medium text-foreground">Overall Health</span>
-                  </div>
-                  <span className="font-bold text-success">Good</span>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-muted/50 rounded-xl">
-                    <p className="text-sm text-muted-foreground mb-1">Growth Stage</p>
-                    <p className="font-semibold text-foreground">Vegetative</p>
-                  </div>
-                  <div className="p-4 bg-muted/50 rounded-xl">
-                    <p className="text-sm text-muted-foreground mb-1">Days to Harvest</p>
-                    <p className="font-semibold text-foreground">~45 days</p>
-                  </div>
-                </div>
+        {/* Weather */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <CloudSun className="w-5 h-5" /> Weather Summary
+          </h2>
 
-                <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
-                  ✅ Soil condition is suitable for crop growth. Continue current irrigation schedule.
+          <div className="p-6 bg-card rounded-2xl shadow">
+            <p className="text-sm text-muted-foreground">Current Weather</p>
+            <p className="text-4xl font-bold">{weatherData.current.temp}°C</p>
+            <p>{weatherData.current.condition}</p>
+
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="flex gap-2">
+                <Droplets /> {weatherData.current.humidity}%
+              </div>
+              <div className="flex gap-2">
+                <Wind /> {weatherData.current.wind} km/h
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-accent/20 rounded-xl border">
+            <div className="flex gap-3">
+              <AlertTriangle />
+              <div>
+                <p className="font-medium">Irrigation Reminder</p>
+                <p className="text-sm text-muted-foreground">
+                  Schedule watering within 24 hours
                 </p>
+                <Link to="/alerts" className="text-primary text-sm font-medium">
+                  View all alerts →
+                </Link>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Alerts */}
-          <Card variant="elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-warning" />
-                Recent Alerts
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {alerts.map((alert, index) => (
-                  <AlertCard
-                    key={index}
-                    title={alert.title}
-                    message={alert.message}
-                    severity={alert.severity}
-                    action={alert.action}
-                    time={alert.time}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
 export default Dashboard;
+
