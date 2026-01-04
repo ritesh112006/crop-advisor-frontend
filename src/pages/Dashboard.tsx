@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { getLatestSensor } from "@/lib/api";
+import { getLatestSensorData } from "@/lib/api";
 
 const Dashboard = () => {
   const [sensorData, setSensorData] = useState<any>(null);
@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   // ✅ Fetch real sensor data
   useEffect(() => {
-    getLatestSensor()
+    getLatestSensorData()
       .then((data) => {
         setSensorData({
           npk: {
