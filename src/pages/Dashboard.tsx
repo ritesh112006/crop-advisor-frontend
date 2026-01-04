@@ -22,15 +22,15 @@ const Dashboard = () => {
   const [sensorData, setSensorData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch real sensor data
+  // ✅ Fetch real sensor data
   useEffect(() => {
     getLatestSensor()
       .then((data) => {
         setSensorData({
           npk: {
-            nitrogen: data.n,
-            phosphorus: data.p,
-            potassium: data.k,
+            nitrogen: data.N,
+            phosphorus: data.P,
+            potassium: data.K,
           },
           moisture: data.moisture,
           tempHumidity: {
@@ -59,28 +59,13 @@ const Dashboard = () => {
     overall: "Good",
     message: "Soil condition is suitable for crop growth",
     details: [
-      { label: "Moisture", status: "optimal", value: `${sensorData.moisture}%` },
-      { label: "NPK Balance", status: "good", value: "Normal" },
-      { label: "pH Level", status: "optimal", value: sensorData.ph },
+      { label: "Moisture", value: `${sensorData.moisture}%` },
+      { label: "NPK Balance", value: "Normal" },
+      { label: "pH Level", value: sensorData.ph },
       {
         label: "Temperature",
-        status: "good",
         value: `${sensorData.tempHumidity.temperature}°C`,
       },
-    ],
-  };
-
-  const weatherData = {
-    current: {
-      temp: sensorData.tempHumidity.temperature,
-      humidity: sensorData.tempHumidity.humidity,
-      wind: 12,
-      condition: "Partly Cloudy",
-    },
-    forecast: [
-      { day: "Today", high: 34, low: 24, icon: Sun },
-      { day: "Tomorrow", high: 32, low: 23, icon: CloudSun },
-      { day: "Wed", high: 30, low: 22, icon: Droplets },
     ],
   };
 
@@ -113,7 +98,8 @@ const Dashboard = () => {
           <CheckCircle className="w-8 h-8 text-green-600" />
           <div>
             <h2 className="text-xl font-semibold">
-              Crop Health: <span className="text-green-600">{soilStatus.overall}</span>
+              Crop Health:{" "}
+              <span className="text-green-600">{soilStatus.overall}</span>
             </h2>
             <p className="text-muted-foreground">{soilStatus.message}</p>
           </div>
@@ -129,57 +115,26 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Grid */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Sensors */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="w-5 h-5" />
-            <h2 className="text-xl font-semibold">Live Sensor Data</h2>
-          </div>
+      {/* Sensors */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <NPKSensor data={sensorData.npk} />
+        <MoistureSensor value={sensorData.moisture} />
+        <TempHumiditySensor data={sensorData.tempHumidity} />
+        <PHSensor value={sensorData.ph} />
+      </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            <NPKSensor data={sensorData.npk} />
-            <MoistureSensor value={sensorData.moisture} />
-            <TempHumiditySensor data={sensorData.tempHumidity} />
-            <PHSensor value={sensorData.ph} />
-          </div>
-        </div>
-
-        {/* Weather */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <CloudSun className="w-5 h-5" /> Weather Summary
-          </h2>
-
-          <div className="p-6 bg-card rounded-2xl shadow">
-            <p className="text-sm text-muted-foreground">Current Weather</p>
-            <p className="text-4xl font-bold">{weatherData.current.temp}°C</p>
-            <p>{weatherData.current.condition}</p>
-
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="flex gap-2">
-                <Droplets /> {weatherData.current.humidity}%
-              </div>
-              <div className="flex gap-2">
-                <Wind /> {weatherData.current.wind} km/h
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 bg-accent/20 rounded-xl border">
-            <div className="flex gap-3">
-              <AlertTriangle />
-              <div>
-                <p className="font-medium">Irrigation Reminder</p>
-                <p className="text-sm text-muted-foreground">
-                  Schedule watering within 24 hours
-                </p>
-                <Link to="/alerts" className="text-primary text-sm font-medium">
-                  View all alerts →
-                </Link>
-              </div>
-            </div>
+      {/* Alert */}
+      <div className="mt-8 p-4 bg-accent/20 rounded-xl border">
+        <div className="flex gap-3">
+          <AlertTriangle />
+          <div>
+            <p className="font-medium">Irrigation Reminder</p>
+            <p className="text-sm text-muted-foreground">
+              Schedule watering within 24 hours
+            </p>
+            <Link to="/alerts" className="text-primary text-sm font-medium">
+              View all alerts →
+            </Link>
           </div>
         </div>
       </div>
@@ -188,4 +143,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
